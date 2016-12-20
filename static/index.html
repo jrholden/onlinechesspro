@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html ng-app="myApp">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title ng-bind="'Online Game! &mdash; '">Online Game</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+    <!-- Custom Fonts -->
+    <link href="bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    <!-- SCRIPTS -->
+    <!-- jQuery -->
+    <script src="bower_components/jquery/dist/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <!--<script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>-->
+
+    <!-- Metis Menu Plugin JavaScript -->
+    <script src="bower_components/metisMenu/dist/metisMenu.min.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+
+    <script src="bower_components/angular/angular.min.js"></script>
+    <script src="bower_components/ui-router/release/angular-ui-router.min.js"></script>
+    <script src="bower_components/angular/angular-messages.js"></script>
+    <script src="bower_components/ui-mask/dist/mask.min.js"></script>
+    <script src="bower_components/ui-bootstrap/ui-bootstrap-tpls-2.0.1.min.js"></script>
+    <link rel="stylesheet" href="bower_components/semantic-ui/dist/semantic.css"/>
+    <script src="bower_components/semantic-ui/dist/semantic.js"></script>
+
+
+    <link rel="stylesheet" type="text/css" href="bower_components/semantic-ui/dist/components/reset.css">
+    <link rel="stylesheet" type="text/css" href="bower_components/semantic-ui/dist/components/site.css">
+    <link rel="stylesheet" type="text/css" href="chessGame/css/chessboard-0.3.0.min.css">
+
+    <link rel="stylesheet" type="text/css" href="bower_components/semantic-ui/dist/components/container.css">
+    <link rel="stylesheet" type="text/css" href="bower_components/semantic-ui/dist/components/grid.css">
+    <link rel="stylesheet" type="text/css" href="bower_components/semantic-ui/dist/components/header.css">
+    <link rel="stylesheet" type="text/css" href="bower_components/semantic-ui/dist/components/image.css">
+    <link rel="stylesheet" type="text/css" href="bower_components/semantic-ui/dist/components/menu.css">
+
+    <link rel="stylesheet" type="text/css" href="bower_components/semantic-ui/dist/components/divider.css">
+    <link rel="stylesheet" type="text/css" href="bower_components/semantic-ui/dist/components/dropdown.css">
+    <link rel="stylesheet" type="text/css" href="bower_components/semantic-ui/dist/components/segment.css">
+    <link rel="stylesheet" type="text/css" href="bower_components/semantic-ui/dist/components/button.css">
+    <link rel="stylesheet" type="text/css" href="bower_components/semantic-ui/dist/components/list.css">
+    <link rel="stylesheet" type="text/css" href="bower_components/semantic-ui/dist/components/icon.css">
+    <link rel="stylesheet" type="text/css" href="bower_components/semantic-ui/dist/components/sidebar.css">
+    <link rel="stylesheet" type="text/css" href="bower_components/semantic-ui/dist/components/transition.css">
+    <link rel="stylesheet" type="text/css" href="css/heroic-features.css">
+</head>
+<body>
+<div class="pusher">
+
+    <div class="ui inverted vertical masthead center aligned segment">
+
+        <div ng-controller="LoginCtrl" class="ui container" ng-init="auth()">
+            <div class="ui large secondary inverted pointing menu">
+
+                <a class="item" href="#/">Home</a>
+                <a class="item" href="#/play">Play</a>
+                <a class="item">Message</a>
+                <div ng-hide="loggedIn()" class="right item">
+                    <a class="ui inverted button" href="#/login">Log in</a>
+                    <a class="ui inverted button" href="#/signup">Sign Up</a>
+                </div>
+                <div ng-if="loggedIn()" class="right menu">
+                    <div class="item">
+                        <a class="ui button" href="#/dashboard">Dashboard</a>
+                    </div>
+                    <div class="item">
+                        <a ng-click="logout()" class="ui button">Logout</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+<div ui-view></div>
+
+    </div>
+
+</div>
+
+<!-- Page Contents -->
+
+
+<!--[if lt IE 7]>
+<p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade
+    your browser</a> to improve your experience.</p>
+<![endif]-->
+
+<!-- In production use:
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/x.x.x/angular.min.js"></script>
+-->
+<script src="app.js"></script>
+<script src="home/homeCtrl.js"></script>
+<script src="home/homeService.js"></script>
+<script src="play/playCtrl.js"></script>
+<script src="play/playService.js"></script>
+<script src="login/loginCtrl.js"></script>
+<script src="dashboard/dashboardService.js"></script>
+<script src="login/loginService.js"></script>
+<script src="dashboard/dashboardCtrl.js"></script>
+
+<script src="js/appServices.js"></script>
+<script src="chessGame/js/chessboard-0.3.0.min.js"></script>
+<script src="chessGame/js/chess.js"></script>
+<script src="components/version/version.js"></script>
+<script src="components/version/version-directive.js"></script>
+<script src="components/version/interpolate-filter.js"></script>
+</body>
+</html>
