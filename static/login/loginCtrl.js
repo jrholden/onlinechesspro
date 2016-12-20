@@ -15,6 +15,7 @@ function LoginController($scope, $http, $rootScope, LoginService) {
                 }else{
                     $scope.isBad = false;
                     $rootScope.isLoggedin = true;
+                    $scope.goToDash();
                 }
         });
     };
@@ -35,7 +36,7 @@ function LoginController($scope, $http, $rootScope, LoginService) {
     };
 
     $scope.goToDash = function () {
-
+        window.location.assign('/#/dashboard');
        
     };
 
