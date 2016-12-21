@@ -22,45 +22,40 @@ require_once realpath('../PHPMailerAutoload.php');
 class PHPMailerTest extends PHPUnit_Framework_TestCase
 {
     /**
+     * Default include path
+     * @var string
+     */
+    const INCLUDE_DIR = '../';
+    /**
      * Holds the default phpmailer instance.
      * @private
      * @var PHPMailer
      */
     public $Mail;
-
     /**
      * Holds the SMTP mail host.
      * @public
      * @var string
      */
     public $Host = '';
-
     /**
      * Holds the change log.
      * @private
      * @var string[]
      */
     public $ChangeLog = array();
-
     /**
      * Holds the note log.
      * @private
      * @var string[]
      */
     public $NoteLog = array();
-
     /**
      * PIDs of any processes we need to kill
      * @var array
      * @access private
      */
     private $pids = array();
-
-    /**
-     * Default include path
-     * @var string
-     */
-    const INCLUDE_DIR = '../';
 
     /**
      * Run before each test is started.
@@ -116,162 +111,6 @@ class PHPMailerTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * Run after each test is completed.
-     */
-    public function tearDown()
-    {
-        // Clean global variables
-        $this->Mail = null;
-        $this->ChangeLog = array();
-        $this->NoteLog = array();
-
-        foreach ($this->pids as $pid) {
-            $p = escapeshellarg($pid);
-            shell_exec("ps $p && kill -TERM $p");
-        }
-    }
-
-
-    /**
-     * Build the body of the message in the appropriate format.
-     *
-     * @private
-     * @return void
-     */
-    public function buildBody()
-    {
-        $this->checkChanges();
-
-        // Determine line endings for message
-        if ($this->Mail->ContentType == 'text/html' || strlen($this->Mail->AltBody) > 0) {
-            $eol = "<br>\r\n";
-            $bullet_start = '<li>';
-            $bullet_end = "</li>\r\n";
-            $list_start = "<ul>\r\n";
-            $list_end = "</ul>\r\n";
-        } else {
-            $eol = "\r\n";
-            $bullet_start = ' - ';
-            $bullet_end = "\r\n";
-            $list_start = '';
-            $list_end = '';
-        }
-
-        $ReportBody = '';
-
-        $ReportBody .= '---------------------' . $eol;
-        $ReportBody .= 'Unit Test Information' . $eol;
-        $ReportBody .= '---------------------' . $eol;
-        $ReportBody .= 'phpmailer version: ' . $this->Mail->Version . $eol;
-        $ReportBody .= 'Content Type: ' . $this->Mail->ContentType . $eol;
-        $ReportBody .= 'CharSet: ' . $this->Mail->CharSet . $eol;
-
-        if (strlen($this->Mail->Host) > 0) {
-            $ReportBody .= 'Host: ' . $this->Mail->Host . $eol;
-        }
-
-        // If attachments then create an attachment list
-        $attachments = $this->Mail->getAttachments();
-        if (count($attachments) > 0) {
-            $ReportBody .= 'Attachments:' . $eol;
-            $ReportBody .= $list_start;
-            foreach ($attachments as $attachment) {
-                $ReportBody .= $bullet_start . 'Name: ' . $attachment[1] . ', ';
-                $ReportBody .= 'Encoding: ' . $attachment[3] . ', ';
-                $ReportBody .= 'Type: ' . $attachment[4] . $bullet_end;
-            }
-            $ReportBody .= $list_end . $eol;
-        }
-
-        // If there are changes then list them
-        if (count($this->ChangeLog) > 0) {
-            $ReportBody .= 'Changes' . $eol;
-            $ReportBody .= '-------' . $eol;
-
-            $ReportBody .= $list_start;
-            for ($i = 0; $i < count($this->ChangeLog); $i++) {
-                $ReportBody .= $bullet_start . $this->ChangeLog[$i][0] . ' was changed to [' .
-                    $this->ChangeLog[$i][1] . ']' . $bullet_end;
-            }
-            $ReportBody .= $list_end . $eol . $eol;
-        }
-
-        // If there are notes then list them
-        if (count($this->NoteLog) > 0) {
-            $ReportBody .= 'Notes' . $eol;
-            $ReportBody .= '-----' . $eol;
-
-            $ReportBody .= $list_start;
-            for ($i = 0; $i < count($this->NoteLog); $i++) {
-                $ReportBody .= $bullet_start . $this->NoteLog[$i] . $bullet_end;
-            }
-            $ReportBody .= $list_end;
-        }
-
-        // Re-attach the original body
-        $this->Mail->Body .= $eol . $ReportBody;
-    }
-
-    /**
-     * Check which default settings have been changed for the report.
-     * @private
-     * @return void
-     */
-    public function checkChanges()
-    {
-        if ($this->Mail->Priority != 3) {
-            $this->addChange('Priority', $this->Mail->Priority);
-        }
-        if ($this->Mail->Encoding != '8bit') {
-            $this->addChange('Encoding', $this->Mail->Encoding);
-        }
-        if ($this->Mail->CharSet != 'iso-8859-1') {
-            $this->addChange('CharSet', $this->Mail->CharSet);
-        }
-        if ($this->Mail->Sender != '') {
-            $this->addChange('Sender', $this->Mail->Sender);
-        }
-        if ($this->Mail->WordWrap != 0) {
-            $this->addChange('WordWrap', $this->Mail->WordWrap);
-        }
-        if ($this->Mail->Mailer != 'mail') {
-            $this->addChange('Mailer', $this->Mail->Mailer);
-        }
-        if ($this->Mail->Port != 25) {
-            $this->addChange('Port', $this->Mail->Port);
-        }
-        if ($this->Mail->Helo != 'localhost.localdomain') {
-            $this->addChange('Helo', $this->Mail->Helo);
-        }
-        if ($this->Mail->SMTPAuth) {
-            $this->addChange('SMTPAuth', 'true');
-        }
-    }
-
-    /**
-     * Add a changelog entry.
-     * @access private
-     * @param string $sName
-     * @param string $sNewValue
-     * @return void
-     */
-    public function addChange($sName, $sNewValue)
-    {
-        $this->ChangeLog[] = array($sName, $sNewValue);
-    }
-
-    /**
-     * Adds a simple note to the message.
-     * @public
-     * @param string $sValue
-     * @return void
-     */
-    public function addNote($sValue)
-    {
-        $this->NoteLog[] = $sValue;
-    }
-
-    /**
      * Adds all of the addresses
      * @access public
      * @param string $sAddress
@@ -290,6 +129,22 @@ class PHPMailerTest extends PHPUnit_Framework_TestCase
                 return $this->Mail->addBCC($sAddress, $sName);
         }
         return false;
+    }
+
+    /**
+     * Run after each test is completed.
+     */
+    public function tearDown()
+    {
+        // Clean global variables
+        $this->Mail = null;
+        $this->ChangeLog = array();
+        $this->NoteLog = array();
+
+        foreach ($this->pids as $pid) {
+            $p = escapeshellarg($pid);
+            shell_exec("ps $p && kill -TERM $p");
+        }
     }
 
     /**
@@ -729,6 +584,134 @@ class PHPMailerTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Build the body of the message in the appropriate format.
+     *
+     * @private
+     * @return void
+     */
+    public function buildBody()
+    {
+        $this->checkChanges();
+
+        // Determine line endings for message
+        if ($this->Mail->ContentType == 'text/html' || strlen($this->Mail->AltBody) > 0) {
+            $eol = "<br>\r\n";
+            $bullet_start = '<li>';
+            $bullet_end = "</li>\r\n";
+            $list_start = "<ul>\r\n";
+            $list_end = "</ul>\r\n";
+        } else {
+            $eol = "\r\n";
+            $bullet_start = ' - ';
+            $bullet_end = "\r\n";
+            $list_start = '';
+            $list_end = '';
+        }
+
+        $ReportBody = '';
+
+        $ReportBody .= '---------------------' . $eol;
+        $ReportBody .= 'Unit Test Information' . $eol;
+        $ReportBody .= '---------------------' . $eol;
+        $ReportBody .= 'phpmailer version: ' . $this->Mail->Version . $eol;
+        $ReportBody .= 'Content Type: ' . $this->Mail->ContentType . $eol;
+        $ReportBody .= 'CharSet: ' . $this->Mail->CharSet . $eol;
+
+        if (strlen($this->Mail->Host) > 0) {
+            $ReportBody .= 'Host: ' . $this->Mail->Host . $eol;
+        }
+
+        // If attachments then create an attachment list
+        $attachments = $this->Mail->getAttachments();
+        if (count($attachments) > 0) {
+            $ReportBody .= 'Attachments:' . $eol;
+            $ReportBody .= $list_start;
+            foreach ($attachments as $attachment) {
+                $ReportBody .= $bullet_start . 'Name: ' . $attachment[1] . ', ';
+                $ReportBody .= 'Encoding: ' . $attachment[3] . ', ';
+                $ReportBody .= 'Type: ' . $attachment[4] . $bullet_end;
+            }
+            $ReportBody .= $list_end . $eol;
+        }
+
+        // If there are changes then list them
+        if (count($this->ChangeLog) > 0) {
+            $ReportBody .= 'Changes' . $eol;
+            $ReportBody .= '-------' . $eol;
+
+            $ReportBody .= $list_start;
+            for ($i = 0; $i < count($this->ChangeLog); $i++) {
+                $ReportBody .= $bullet_start . $this->ChangeLog[$i][0] . ' was changed to [' .
+                    $this->ChangeLog[$i][1] . ']' . $bullet_end;
+            }
+            $ReportBody .= $list_end . $eol . $eol;
+        }
+
+        // If there are notes then list them
+        if (count($this->NoteLog) > 0) {
+            $ReportBody .= 'Notes' . $eol;
+            $ReportBody .= '-----' . $eol;
+
+            $ReportBody .= $list_start;
+            for ($i = 0; $i < count($this->NoteLog); $i++) {
+                $ReportBody .= $bullet_start . $this->NoteLog[$i] . $bullet_end;
+            }
+            $ReportBody .= $list_end;
+        }
+
+        // Re-attach the original body
+        $this->Mail->Body .= $eol . $ReportBody;
+    }
+
+    /**
+     * Check which default settings have been changed for the report.
+     * @private
+     * @return void
+     */
+    public function checkChanges()
+    {
+        if ($this->Mail->Priority != 3) {
+            $this->addChange('Priority', $this->Mail->Priority);
+        }
+        if ($this->Mail->Encoding != '8bit') {
+            $this->addChange('Encoding', $this->Mail->Encoding);
+        }
+        if ($this->Mail->CharSet != 'iso-8859-1') {
+            $this->addChange('CharSet', $this->Mail->CharSet);
+        }
+        if ($this->Mail->Sender != '') {
+            $this->addChange('Sender', $this->Mail->Sender);
+        }
+        if ($this->Mail->WordWrap != 0) {
+            $this->addChange('WordWrap', $this->Mail->WordWrap);
+        }
+        if ($this->Mail->Mailer != 'mail') {
+            $this->addChange('Mailer', $this->Mail->Mailer);
+        }
+        if ($this->Mail->Port != 25) {
+            $this->addChange('Port', $this->Mail->Port);
+        }
+        if ($this->Mail->Helo != 'localhost.localdomain') {
+            $this->addChange('Helo', $this->Mail->Helo);
+        }
+        if ($this->Mail->SMTPAuth) {
+            $this->addChange('SMTPAuth', 'true');
+        }
+    }
+
+    /**
+     * Add a changelog entry.
+     * @access private
+     * @param string $sName
+     * @param string $sNewValue
+     * @return void
+     */
+    public function addChange($sName, $sNewValue)
+    {
+        $this->ChangeLog[] = array($sName, $sNewValue);
+    }
+
+    /**
      * Word-wrap a multibyte message.
      */
     public function testWordWrapMultibyte()
@@ -1158,6 +1141,17 @@ EOT;
 
         $this->buildBody();
         $this->assertTrue($this->Mail->send(), $this->Mail->ErrorInfo);
+    }
+
+    /**
+     * Adds a simple note to the message.
+     * @public
+     * @param string $sValue
+     * @return void
+     */
+    public function addNote($sValue)
+    {
+        $this->NoteLog[] = $sValue;
     }
 
     /**

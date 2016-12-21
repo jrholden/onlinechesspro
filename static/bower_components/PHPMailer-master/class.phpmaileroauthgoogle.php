@@ -49,6 +49,19 @@ class PHPMailerOAuthGoogle
         $this->oauthUserEmail = $UserEmail;
     }
 
+    public function getOauth64()
+    {
+        $token = $this->getToken();
+        return base64_encode("user=" . $this->oauthUserEmail . "\001auth=Bearer " . $token . "\001\001");
+    }
+
+    private function getToken()
+    {
+        $provider = $this->getProvider();
+        $grant = $this->getGrant();
+        return $provider->getAccessToken($grant, ['refresh_token' => $this->oauthRefreshToken]);
+    }
+
     private function getProvider()
     {
         return new League\OAuth2\Client\Provider\Google([
@@ -60,18 +73,5 @@ class PHPMailerOAuthGoogle
     private function getGrant()
     {
         return new \League\OAuth2\Client\Grant\RefreshToken();
-    }
-
-    private function getToken()
-    {
-        $provider = $this->getProvider();
-        $grant = $this->getGrant();
-        return $provider->getAccessToken($grant, ['refresh_token' => $this->oauthRefreshToken]);
-    }
-
-    public function getOauth64()
-    {
-        $token = $this->getToken();
-        return base64_encode("user=" . $this->oauthUserEmail . "\001auth=Bearer " . $token . "\001\001");
     }
 }

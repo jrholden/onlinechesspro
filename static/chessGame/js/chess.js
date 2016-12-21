@@ -1186,6 +1186,14 @@ var Chess = function(fen) {
     /***************************************************************************
      * PUBLIC CONSTANTS (is there a better way to do this?)
      **************************************************************************/
+    turn: function () {
+        return turn;
+    },
+      setTurn: function (newTurn) {
+          turn = newTurn;
+      },
+
+
     WHITE: WHITE,
     BLACK: BLACK,
     PAWN: PAWN,
@@ -1194,7 +1202,8 @@ var Chess = function(fen) {
     ROOK: ROOK,
     QUEEN: QUEEN,
     KING: KING,
-    SQUARES: (function() {
+
+      SQUARES: (function() {
                 /* from the ECMA-262 spec (section 12.6.4):
                  * "The mechanics of enumerating the properties ... is
                  * implementation dependent"

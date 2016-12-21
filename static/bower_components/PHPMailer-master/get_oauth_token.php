@@ -91,6 +91,11 @@ class Google extends AbstractProvider
         return $params;
     }
 
+    protected function getScopeSeparator()
+    {
+        return ' ';
+    }
+
     protected function getDefaultScopes()
     {
         return [
@@ -98,11 +103,6 @@ class Google extends AbstractProvider
             'openid',
             'profile',
         ];
-    }
-
-    protected function getScopeSeparator()
-    {
-        return ' ';
     }
 
     protected function checkResponse(ResponseInterface $response, $data)

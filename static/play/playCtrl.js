@@ -5,18 +5,29 @@
 'use strict';
 
 angular.module('myApp')
-    .controller('PlayCtrl', ['$scope', '$http','PlayService','SocketService', PlayController]);
+    .controller('PlayCtrl', ['$scope', '$http', 'PlayService', 'SocketService', PlayController]);
 
 function PlayController($scope, $http, PlayService, SocketService) {
     console.log("I'm Play");
 
-    $scope.playGame = function(){
-        PlayService.initGame();
+    $scope.play = true;
+    $scope.fen = "";
+    SocketService.connectToSocket();
+    $scope.playGame = function () {
+
+        PlayService.initGame($scope.play, $scope.fen).then(function (data) {
+
+            SocketService.send();
+
+
+        });
+        SocketService.onMessage().then(function (e) {
+
+            $scope.play = false;
+            $scope.fen = e.data;
+            $scope.playGame();
+        });
     };
 
-    SocketService.on(init)
-
-    //console.log(PlayService.getBoard().fen());
     $scope.playGame();
-    console.log(PlayService.getBoard().fen());
 }
