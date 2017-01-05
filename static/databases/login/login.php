@@ -48,7 +48,7 @@ if ($result->num_rows > 0) {
                 'HS512'
             );
 
-            $unencodedArray = ['jwt' => $jwt];
+            $unencodedArray = ['jwt' => $jwt, 'user' => $userName];
 
             echo json_encode($unencodedArray);
         } 

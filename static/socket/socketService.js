@@ -4,32 +4,30 @@
 angular.module('myApp')
     .factory('SocketService', ['$q', '$http', '$window', '$rootScope', 'PlayService', function ($q, $http, $window, $rootScope, PlayService) {
 
-        var conn = new WebSocket('ws://onlinechesspro.com:8080');
+        var conn;
         var service = {};
         service.connectToSocket = function () {
+            conn = new WebSocket('ws://onlinechesspro.com:8080');
+            var defer = $q.defer();
 
             conn.onopen = function (e) {
                 console.log("Connection established! " + e);
+                defer.resolve();
             };
+            return defer.promise;
         };
         service.send = function () {
             conn.send(PlayService.getPosition());
-            if (PlayService.whatTurn()) {
-                PlayService.setTurn(false);
-            } else {
-                PlayService.setTurn(true);
-            }
         };
+        service.sendConnect = function () {
+            conn.send("connected");
+        };
+        
         service.onMessage = function () {
             var defer = $q.defer();
             conn.onmessage = function (e) {
-                console.log(e.data);
-                if (PlayService.whatTurn()) {
-                    PlayService.setTurn(false);
-                } else {
-                    PlayService.setTurn(true);
-                }
-                return defer.resolve(e);
+                
+                return defer.resolve(JSON.parse(e.data));
 
             };
             return defer.promise;

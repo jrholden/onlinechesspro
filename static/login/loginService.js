@@ -46,8 +46,9 @@ angular.module('myApp')
                 return defer.resolve();
             }).error(function(){
                 $rootScope.isLoggedin = false;
+                $window.location.href = '#/login';
                 return defer.reject("Bad Credentials");
-                //$window.location.href = '#/login';
+                
             });
            
             return defer.promise;

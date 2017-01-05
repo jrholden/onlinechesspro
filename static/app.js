@@ -20,7 +20,12 @@ angular.module('myApp', [
             .state('play', {
                 url: '/play',
                 templateUrl: 'play/play.html?v=' + window.app_version,
-                controller: 'PlayCtrl'
+                controller: 'PlayCtrl',
+                resolve: {
+                    auth: function (LoginService) {
+                        return LoginService.authUser();
+                    }
+                }
             })
             .state('login', {
                 title: 'Login',

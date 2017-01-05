@@ -9,4 +9,5 @@ angular.module('myApp')
 function DashboardController($scope, $http, $rootScope) {
     
     console.log("Dashboard here");
+    
 }

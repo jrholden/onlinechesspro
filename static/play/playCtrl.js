@@ -9,25 +9,68 @@ angular.module('myApp')
 
 function PlayController($scope, $http, PlayService, SocketService) {
     console.log("I'm Play");
+    $scope.gameFound = true;
+    $scope.gameSearch = true;
+    $scope.loadMessage = "Searching For Your Game!";
 
-    $scope.play = true;
     $scope.fen = "";
-    SocketService.connectToSocket();
+    $scope.play = true;
+    $scope.turn = "w";
+    
     $scope.playGame = function () {
 
-        PlayService.initGame($scope.play, $scope.fen).then(function (data) {
-
+        PlayService.initGame($scope.play, $scope.fen, $scope.player, $scope.turn).then(function (data) {
+            
             SocketService.send();
 
 
         });
         SocketService.onMessage().then(function (e) {
 
-            $scope.play = false;
-            $scope.fen = e.data;
-            $scope.playGame();
+            console.log("Message from: "+e.player);
+            if(e.msg !== "disconnect") {
+                if (e.player === "black") {
+                    $scope.turn = "w";
+                } else {
+                    $scope.turn = "b";
+                }
+
+                $scope.fen = e.msg;
+
+                $scope.play = false;
+                $scope.playGame();
+            }else{
+                $scope.loadMessage = "Your Opponent has left!";
+                $scope.gameFound = false;
+                
+            }
+        });
+
+    };
+    
+    $scope.findGame = function () {
+        $scope.gameSearch = false;
+        SocketService.connectToSocket().then(function () {
+            console.log("Connected!");
+            SocketService.onMessage().then(function (e) {
+
+                if (e.msg === "connected") {
+                    
+                    if (e.player === "black") {
+                        $scope.player = "white";
+                        console.log("sending to black");
+                        SocketService.sendConnect();
+                    }else{
+                        $scope.player = "black";
+                    }
+                    
+                    $scope.gameSearch = true;
+                    $scope.gameFound = true;
+                    $scope.playGame();
+                }
+            });
+
         });
     };
 
-    $scope.playGame();
 }

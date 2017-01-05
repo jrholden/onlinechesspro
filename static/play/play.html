@@ -1,9 +1,11 @@
 <div class="ui raised very padded text container segment">
-    <h2 class="ui header">Chess Game</h2>
+    <h2 class="ui header">{{user}}'s game</h2>
     <center>
+        <img height="100px" src="../img/loadingGif.gif" ng-show="!gameSearch"/>
+        <h3 ng-show="!gameFound">{{loadMessage}}</h3>
         <div id="board" style="width: 400px"></div>
     </center>
-    <p>Status: <span>{{status}}</span></p>
-    <input ng-click="(playGame())" type="button" id="startBtn" value="Start Position" />
+    <p>Status: <span>{{turn}}'s</span> Turn</p>
+    <input ng-click="findGame()" type="button" id="startBtn" value="Search For Game?"/>
     <p>Chess against Player1</p>
 </div>

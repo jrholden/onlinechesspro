@@ -13,6 +13,8 @@ function LoginController($scope, $http, $rootScope, LoginService) {
                     $scope.isBad = true;
                     console.log("Message should appear");
                 }else{
+                    console.log(data);
+                    $rootScope.user = data.user;
                     $scope.isBad = false;
                     $rootScope.isLoggedin = true;
                     $scope.goToDash();

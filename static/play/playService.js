@@ -5,13 +5,17 @@ angular.module('myApp')
     .factory('PlayService', ['$q', '$http', '$window', '$rootScope', function ($q, $http, $window, $rootScope) {
 
         var service = {};
-        var board, moved, cfg, status;
+        var board, moved, cfg, status, currPlayer;
         var player1 = true;
-        service.initGame = function (startOfGame, postition) {
+        service.initGame = function (startOfGame, postition, player, turn) {
 
             var defer = $q.defer();
             var game = new Chess();
+            currPlayer = player;
             moved = false;
+            if (startOfGame && player === "black") {
+                moved = true;
+            }
             var onDragStart = function (source, piece, position, orientation) {
                 if (game.game_over() === true || moved ||
                     (game.turn() === 'w' && piece.search(/^b/) !== -1) ||
@@ -31,36 +35,30 @@ angular.module('myApp')
 
                 moved = true;
                 return defer.resolve();
-
+                
             };
 
             if (startOfGame) {
-
+                console.log("Board should default to new");
                 cfg = {
                     draggable: true,
+                    orientation: player,
                     position: 'start',
                     onDragStart: onDragStart,
                     onDrop: onDrop
                 };
-                board = new ChessBoard('board', cfg);
+
             } else {
                 cfg = {
                     draggable: true,
+                    orientation: player,
                     position: postition,
                     onDragStart: onDragStart,
                     onDrop: onDrop
                 };
-                board = new ChessBoard('board', cfg);
-                if (!service.whatTurn()) {
-                    game.setTurn("b");
-                    status = "Blacks Turn";
-                    console.log("Blacks Turn");
-                } else {
-                    game.setTurn("w");
-                    status = "Whites Turn";
-                    console.log("Whites Turn");
-                }
             }
+            board = new ChessBoard('board', cfg);
+            game.setTurn(turn);
             return defer.promise;
         };
 
@@ -71,10 +69,14 @@ angular.module('myApp')
             return player1;
         };
         service.setTurn = function (whatPlayer) {
-            player1 = whatPlayer;
+
         };
         service.getPosition = function () {
             return board.fen();
+        };
+        service.getCurrPlayer = function () {
+            console.log(currPlayer);
+            return currPlayer;
         };
         service.hasMoved = function () {
             return moved;
